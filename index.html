@@ -3,41 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rekap KSO Proyek</title>
+    <title>Sistem Rekap Premium</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 50px; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 15px; }
-        .history-card { background: white; padding: 15px; border-radius: 10px; border-left: 5px solid #0d6efd; margin-bottom: 10px; box-shadow: 0 1px 5px rgba(0,0,0,0.05);}
-        .btn-edit { font-size: 0.8rem; padding: 2px 10px; }
-        label { font-weight: 600; font-size: 0.85rem; color: #555; margin-bottom: 3px; }
-        .form-control, .form-select { font-size: 0.95rem; }
+        /* TEMA PREMIUM ULTIMATE (Dark, Red, Orange, Yellow) */
+        body { background-color: #0a0a0a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 50px; color: #f0f0f0; }
+        
+        /* Tipografi Premium */
+        .title-gradient { background: linear-gradient(45deg, #ff2a2a, #ff7b00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; letter-spacing: 1px; }
+        .subtitle { color: #888; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; }
+        
+        /* Card & Box Style */
+        .premium-card { background-color: #141414; border: 1px solid #2a2a2a; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 20px; position: relative; overflow: hidden; }
+        .premium-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, #ff0000, #ff8c00); }
+        
+        /* Total Pengeluaran Box */
+        .total-box { background: linear-gradient(145deg, #1a1a1a, #0f0f0f); border: 1px solid #333; border-radius: 16px; padding: 25px 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(255, 60, 0, 0.15); }
+        .total-label { color: #ff5e00; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        .total-amount { color: #ffcc00; font-size: 2.2rem; font-weight: 900; text-shadow: 0 0 15px rgba(255, 204, 0, 0.4); }
+        
+        /* History Card */
+        .history-card { background: #181818; padding: 15px; border-radius: 12px; border-left: 4px solid #ffcc00; margin-bottom: 12px; transition: transform 0.2s; }
+        .history-card:active { transform: scale(0.98); }
+        
+        /* Form Inputs Dark Mode */
+        label { color: #999; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .form-control, .form-select { background-color: #222; border: 1px solid #333; color: #fff; border-radius: 8px; font-size: 0.95rem; }
+        .form-control:focus, .form-select:focus { background-color: #2a2a2a; border-color: #ff5e00; color: #fff; box-shadow: 0 0 0 0.25rem rgba(255, 94, 0, 0.25); }
+        .form-select option { background-color: #222; color: #fff; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        
+        /* Buttons */
+        .btn-premium { background: linear-gradient(45deg, #cc0000, #ff6600); color: white; border: none; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-radius: 10px; transition: 0.3s; }
+        .btn-premium:hover { background: linear-gradient(45deg, #ff1a1a, #ff8533); color: white; box-shadow: 0 5px 20px rgba(255, 50, 0, 0.4); }
+        .btn-edit { background: #222; color: #ffcc00; border: 1px solid #444; font-size: 0.75rem; padding: 4px 12px; border-radius: 6px; font-weight: bold; }
+        
+        /* Badges */
+        .badge-proyek { background-color: #ff2a2a; color: white; font-weight: 700; letter-spacing: 1px; }
+        .badge-kategori { background-color: #ff9900; color: #000; font-weight: 700; }
     </style>
 </head>
 <body>
 
-<div class="container mt-3">
-    <h5 class="text-center fw-bold text-primary mb-3">REKAP PROYEK<br><small class="text-dark">CV. Danli & PT. STM</small></h5>
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <h4 class="title-gradient m-0">KSO PROJECT CONTROL</h4>
+        <div class="subtitle">CV. Danli & PT. STM</div>
+    </div>
 
-    <div class="card p-3">
+    <div class="total-box">
+        <div class="total-label">⚡ Total Pengeluaran Proyek ⚡</div>
+        <div class="total-amount" id="totalPengeluaran">Rp 0</div>
+    </div>
+
+    <div class="premium-card p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="m-0 fw-bold" id="formTitle">📝 Input Data Baru</h6>
-            <button id="btnCancelEdit" class="btn btn-sm btn-danger d-none" onclick="cancelEdit()">Batal Edit</button>
+            <h6 class="m-0 fw-bold text-white" id="formTitle">DATA ENTRY</h6>
+            <button id="btnCancelEdit" class="btn btn-sm btn-outline-danger d-none" onclick="cancelEdit()">Batal</button>
         </div>
         
         <form id="rekapForm">
             <input type="hidden" name="action" id="action" value="insert">
             <input type="hidden" name="rowIndex" id="rowIndex" value="">
 
-            <div class="mb-2">
+            <div class="mb-3">
                 <label>Tanggal</label>
                 <input type="date" name="tanggal" id="tanggal" class="form-control" required>
             </div>
-            <div class="row mb-2">
+            <div class="row mb-3">
                 <div class="col-6">
                     <label>Kategori</label>
                     <select name="kategori" id="kategori" class="form-select" required>
-                        <option value="" disabled selected>Pilih...</option>
+                        <option value="" disabled selected>PILIH...</option>
                         <option value="MATERIAL">MATERIAL</option>
                         <option value="UPAH">UPAH</option>
                         <option value="KANTOR">KANTOR</option>
@@ -47,26 +84,16 @@
                 <div class="col-6">
                     <label>Proyek</label>
                     <select name="proyek" id="proyek" class="form-select" required>
-                        <option value="" disabled selected>Pilih...</option>
+                        <option value="" disabled selected>PILIH...</option>
                         <option value="GS">GS</option>
                         <option value="SBG">SBG</option>
                         <option value="KT">KT</option>
                     </select>
                 </div>
             </div>
-            <div class="mb-2">
+            <div class="mb-3">
                 <label>Uraian / Pekerjaan</label>
-                <input type="text" name="uraian" id="uraian" class="form-control" required>
-            </div>
-            <div class="row mb-2">
-                <div class="col-6">
-                    <label>No. Ref (Opsional)</label>
-                    <input type="text" name="no" id="no" class="form-control">
-                </div>
-                <div class="col-6">
-                    <label>Ket Tambahan</label>
-                    <input type="text" name="keterangan" id="keterangan" class="form-control">
-                </div>
+                <input type="text" name="uraian" id="uraian" class="form-control" placeholder="Contoh: Semen 50kg..." required>
             </div>
             <div class="row mb-3">
                 <div class="col-4">
@@ -74,26 +101,27 @@
                     <input type="number" name="volume" id="volume" class="form-control" step="any" value="1" required>
                 </div>
                 <div class="col-8">
-                    <label>Harga Satuan (Rp)</label>
-                    <input type="number" name="harga" id="harga" class="form-control" required>
+                    <label>Harga Satuan</label>
+                    <input type="number" name="harga" id="harga" class="form-control" placeholder="Rp 0" required>
                 </div>
             </div>
-            <button type="submit" id="btnSubmit" class="btn btn-primary w-100 fw-bold py-2">💾 Simpan Data</button>
+            <button type="submit" id="btnSubmit" class="btn btn-premium w-100 py-3 mt-2">SIMPAN DATA</button>
         </form>
     </div>
 
-    <h6 class="fw-bold mt-4 mb-2 text-secondary d-flex justify-content-between">
-        <span>🕒 10 Transaksi Terakhir</span>
-        <span onclick="loadHistory()" style="cursor:pointer;">🔄 Refresh</span>
-    </h6>
+    <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+        <h6 class="m-0 fw-bold" style="color:#aaa; letter-spacing:1px;">LATEST LOGS (10)</h6>
+        <span onclick="loadHistory()" style="cursor:pointer; color:#ff9900; font-size:0.8rem; font-weight:bold;">🔄 REFRESH</span>
+    </div>
+    
     <div id="historyContainer">
-        <div class="text-center text-muted my-4"><small>Memuat data...</small></div>
+        <div class="text-center text-muted my-4">Sinkronisasi server...</div>
     </div>
 </div>
 
 <script>
     // ==========================================
-    // MASUKKAN URL DEPLOY APPS SCRIPT DI BAWAH INI
+    // MASUKKAN URL DEPLOY APPS SCRIPT YANG *BARU* DI BAWAH INI
     // ==========================================
     const scriptURL = 'https://script.google.com/macros/s/AKfycbw41ZYyP-8ts3v6d3ySf2jQkEIrnOqs2iECNhBSde9kiZXUWBf-zYwgmJ5HB03AEN0/exec'; 
 
@@ -102,35 +130,44 @@
     const historyContainer = document.getElementById('historyContainer');
     const formTitle = document.getElementById('formTitle');
     const btnCancelEdit = document.getElementById('btnCancelEdit');
+    const displayTotal = document.getElementById('totalPengeluaran');
 
-    const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(angka || 0);
+    const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
 
-    // Variabel global untuk menampung data history sementara
     let currentHistoryData = [];
 
     function loadHistory() {
-        historyContainer.innerHTML = '<div class="text-center text-muted my-4"><small>🔄 Sinkronisasi data...</small></div>';
+        historyContainer.innerHTML = '<div class="text-center text-muted my-4">Mengambil data dari server...</div>';
         
-        // Menambahkan parameter timestamp agar HP tidak meload cache/history lama
         fetch(scriptURL + "?t=" + new Date().getTime())
             .then(res => res.json())
             .then(data => {
-                currentHistoryData = data;
+                // UPDATE TOTAL PENGELUARAN
+                displayTotal.innerText = formatRp(data.total);
+
+                // UPDATE HISTORY CARDS
+                currentHistoryData = data.history;
                 let html = '';
-                if(data.length === 0) {
-                    html = '<div class="text-center text-muted"><small>Belum ada data</small></div>';
+                if(currentHistoryData.length === 0) {
+                    html = '<div class="text-center text-muted">Data log masih kosong.</div>';
                 } else {
-                    data.forEach((row, index) => {
+                    currentHistoryData.forEach((row, index) => {
                         html += `
                         <div class="history-card">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <span class="badge bg-secondary">${row.proyek} - ${row.kategori}</span>
-                                <small class="text-muted">${row.tanggal}</small>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <span class="badge badge-proyek">${row.proyek}</span>
+                                    <span class="badge badge-kategori ms-1">${row.kategori}</span>
+                                </div>
+                                <small style="color:#666; font-weight:600;">${row.tanggal}</small>
                             </div>
-                            <div class="fw-bold text-dark" style="font-size:1.05rem;">${row.uraian}</div>
-                            <div class="d-flex justify-content-between align-items-end mt-2">
-                                <div class="text-success fw-bold">${row.volume} x ${formatRp(row.harga)} = ${formatRp(row.jumlah)}</div>
-                                <button class="btn btn-outline-primary btn-edit" onclick="editData(${index})">✏️ Edit</button>
+                            <div class="fw-bold text-white mb-2" style="font-size:1.05rem;">${row.uraian}</div>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <div style="color:#aaa; font-size:0.9rem;">
+                                    ${row.volume} <span style="font-size:0.75rem;">x</span> ${formatRp(row.harga)}
+                                    <div style="color:#ffcc00; font-weight:900; font-size:1.1rem; margin-top:2px;">${formatRp(row.jumlah)}</div>
+                                </div>
+                                <button class="btn btn-edit" onclick="editData(${index})">EDIT LOG</button>
                             </div>
                         </div>`;
                     });
@@ -138,35 +175,25 @@
                 historyContainer.innerHTML = html;
             })
             .catch(err => {
-                historyContainer.innerHTML = '<div class="text-center text-danger"><small>Gagal memuat history.</small></div>';
+                historyContainer.innerHTML = '<div class="text-center text-danger">Gagal sinkronisasi. Cek koneksi Anda.</div>';
             });
     }
 
     function editData(index) {
         const data = currentHistoryData[index];
-        
-        // Ubah state form menjadi Update
         document.getElementById('action').value = 'update';
         document.getElementById('rowIndex').value = data.rowIndex;
-        
-        // Isi form dengan data lama
         document.getElementById('tanggal').value = data.tanggal;
         document.getElementById('kategori').value = data.kategori;
         document.getElementById('proyek').value = data.proyek;
         document.getElementById('uraian').value = data.uraian;
-        document.getElementById('no').value = data.no;
-        document.getElementById('keterangan').value = data.keterangan;
         document.getElementById('volume').value = data.volume;
         document.getElementById('harga').value = data.harga;
 
-        // Ubah tampilan form
-        formTitle.innerHTML = '✏️ Edit Data (Baris ' + data.rowIndex + ')';
-        formTitle.classList.replace('text-primary', 'text-warning');
-        btnSubmit.classList.replace('btn-primary', 'btn-warning');
-        btnSubmit.innerHTML = '🔄 Update Data';
+        formTitle.innerHTML = 'UPDATE DATA (Baris ' + data.rowIndex + ')';
+        formTitle.style.color = '#ffcc00';
+        btnSubmit.innerHTML = 'SIMPAN PERUBAHAN';
         btnCancelEdit.classList.remove('d-none');
-
-        // Scroll otomatis ke atas
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -174,34 +201,25 @@
         form.reset();
         document.getElementById('action').value = 'insert';
         document.getElementById('rowIndex').value = '';
-        
-        formTitle.innerHTML = '📝 Input Data Baru';
-        formTitle.classList.replace('text-warning', 'text-primary');
-        btnSubmit.classList.replace('btn-warning', 'btn-primary');
-        btnSubmit.innerHTML = '💾 Simpan Data';
+        formTitle.innerHTML = 'DATA ENTRY';
+        formTitle.style.color = '#fff';
+        btnSubmit.innerHTML = 'SIMPAN DATA';
         btnCancelEdit.classList.add('d-none');
     }
 
     form.addEventListener('submit', e => {
         e.preventDefault();
-        const isUpdate = document.getElementById('action').value === 'update';
-        
         btnSubmit.disabled = true;
-        btnSubmit.innerHTML = '⏳ Proses...';
+        btnSubmit.innerHTML = 'MEMPROSES...';
 
         fetch(scriptURL, { method: 'POST', body: new FormData(form) })
             .then(response => response.text())
             .then(result => {
-                alert(result); // Menampilkan pesan sukses dari script
-                cancelEdit(); // Reset form kembali ke mode Insert
-                loadHistory(); // Tarik data terbaru
+                cancelEdit();
+                loadHistory(); 
             })
-            .catch(error => {
-                alert('Gagal memproses data. Cek koneksi Anda.');
-            })
-            .finally(() => {
-                btnSubmit.disabled = false;
-            });
+            .catch(error => alert('Gagal memproses data!'))
+            .finally(() => btnSubmit.disabled = false);
     });
 
     window.onload = loadHistory;
