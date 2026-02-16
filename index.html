@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KSO Financial Ultimate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --bg-dark: #0a0c10; --card-bg: #161a23; --accent-green: #00ff88; --accent-red: #ff3333; --accent-orange: #ff7700; --accent-yellow: #ffcc00; --text-main: #f0f0f0; --text-muted: #8b92a5; }
         body { background-color: var(--bg-dark); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 50px; color: var(--text-main); }
         
         .title-gradient { background: linear-gradient(45deg, var(--accent-yellow), var(--accent-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; letter-spacing: 1px; }
-        .card-premium { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 8px 25px rgba(0,0,0,0.5); margin-bottom: 20px; }
         
         /* Saldo Box */
         .saldo-box { text-align: center; margin-bottom: 20px; padding: 25px 15px; background: linear-gradient(145deg, #11141b, #0c0e12); border-radius: 20px; border: 1px solid #222; }
@@ -21,25 +21,33 @@
         .saldo-negative { color: var(--accent-red); text-shadow: 0 0 20px rgba(255, 51, 51, 0.3); }
         
         /* Stats Grid */
-        .stat-split { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .stat-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border-left: 3px solid; }
         .stat-in { border-color: var(--accent-green); }
         .stat-out { border-color: var(--accent-red); }
         .stat-box .title { font-size: 0.7rem; color: var(--text-muted); font-weight: bold; }
         .stat-box .val { font-size: 1.1rem; font-weight: 800; color: #fff; }
+        .detail-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; color: #ccc; border-bottom: 1px dashed #333; padding-bottom: 2px; }
 
-        /* Chart Canvas Container */
-        .chart-container { position: relative; height: 180px; width: 100%; display: flex; justify-content: center; align-items: center; }
+        /* Chart Canvas */
+        .chart-container { position: relative; height: 180px; width: 100%; display: flex; justify-content: center; align-items: center; background: var(--card-bg); border-radius: 12px; padding: 10px; border: 1px solid #222;}
         
-        /* Form & Inputs */
+        /* Buttons */
+        .btn-premium { background: linear-gradient(45deg, var(--accent-orange), var(--accent-red)); color: white; border: none; font-weight: 800; border-radius: 12px; padding: 14px; width: 100%; box-shadow: 0 5px 15px rgba(255,119,0,0.3); letter-spacing: 1px; }
+        .btn-outline-stats { border: 1px solid #444; color: var(--accent-yellow); border-radius: 12px; padding: 10px; width: 100%; font-weight: bold; background: transparent; transition: 0.3s; }
+        
+        /* Modal Pop-up Customization */
+        .modal-content { background-color: var(--card-bg); border: 1px solid #333; color: white; border-radius: 16px; }
+        .modal-header { border-bottom: 1px solid #333; }
+        .btn-close-custom { background: transparent; border: none; color: white; font-size: 1.5rem; line-height: 1; }
+        
+        /* Form Inputs */
         label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
         .form-control, .form-select { background-color: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; border-radius: 8px; }
         .form-control:focus, .form-select:focus { background-color: rgba(0,0,0,0.8); border-color: var(--accent-orange); color: #fff; box-shadow: none; }
         option { background-color: var(--card-bg); }
         
-        .btn-premium { background: linear-gradient(45deg, var(--accent-orange), var(--accent-red)); color: white; border: none; font-weight: 800; border-radius: 8px; padding: 12px; width: 100%; }
-        
-        /* Search & History */
+        /* History */
         .search-box { background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; border-radius: 20px; padding: 10px 20px; width: 100%; margin-bottom: 15px; }
         .history-card { background: rgba(0,0,0,0.2); border: 1px solid #2a2d35; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--accent-yellow); }
         .history-card.in { border-left-color: var(--accent-green); }
@@ -58,45 +66,66 @@
         <div class="saldo-amount" id="valSaldo">Rp 0</div>
     </div>
 
-    <div class="stat-split">
-        <div class="stat-box stat-in">
-            <div class="title">📥 KAS MASUK</div>
-            <div class="val text-success" id="valMasuk">Rp 0</div>
+    <button type="button" class="btn btn-premium mb-3" onclick="openModalForNew()">
+        ➕ INPUT TRANSAKSI BARU
+    </button>
+
+    <button class="btn btn-outline-stats mb-4" type="button" data-bs-toggle="collapse" data-bs-target="#detailDashboard">
+        📊 TAMPILKAN DETAIL & GRAFIK ▼
+    </button>
+
+    <div class="collapse" id="detailDashboard">
+        <div class="stat-split">
+            <div class="stat-box stat-in">
+                <div class="title text-center mb-2">📥 KAS MASUK PROYEK</div>
+                <div class="val text-success text-center mb-2" id="valMasuk">Rp 0</div>
+                <div class="detail-row"><span>GS</span><span id="inGS">0</span></div>
+                <div class="detail-row"><span>SBG</span><span id="inSBG">0</span></div>
+                <div class="detail-row" style="border:none;"><span>KT</span><span id="inKT">0</span></div>
+            </div>
+            <div class="stat-box stat-out">
+                <div class="title text-center mb-2">📤 PENGELUARAN PROYEK</div>
+                <div class="val text-danger text-center mb-2" id="valKeluar">Rp 0</div>
+                <div class="detail-row"><span>GS</span><span id="outGS">0</span></div>
+                <div class="detail-row"><span>SBG</span><span id="outSBG">0</span></div>
+                <div class="detail-row" style="border:none;"><span>KT</span><span id="outKT">0</span></div>
+            </div>
         </div>
-        <div class="stat-box stat-out">
-            <div class="title">📤 PENGELUARAN</div>
-            <div class="val text-danger" id="valKeluar">Rp 0</div>
+
+        <div class="row mb-4">
+            <div class="col-6"><div class="chart-container"><canvas id="chartProyek"></canvas></div></div>
+            <div class="col-6"><div class="chart-container"><canvas id="chartKategori"></canvas></div></div>
         </div>
     </div>
 
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <div class="card-premium text-center">
-                <div class="saldo-label mb-2">🔥 PENGELUARAN PER PROYEK</div>
-                <div class="chart-container"><canvas id="chartProyek"></canvas></div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card-premium text-center">
-                <div class="saldo-label mb-2">📊 PENGELUARAN KATEGORI</div>
-                <div class="chart-container"><canvas id="chartKategori"></canvas></div>
-            </div>
-        </div>
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari nama barang, proyek, kategori..." onkeyup="filterHistory()">
+    
+    <div id="historyContainer">
+        <div class="text-center text-muted my-4">Sinkronisasi database...</div>
     </div>
+</div>
 
-    <div class="card-premium">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="m-0 fw-bold text-white" id="formTitle">⚙️ INPUT TRANSAKSI</h6>
-            <button id="btnCancelEdit" class="btn btn-sm btn-outline-danger d-none" onclick="cancelEdit()">Batal</button>
-        </div>
-        
+<div class="modal fade" id="formModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title fw-bold" id="formTitle">⚙️ INPUT TRANSAKSI</h6>
+        <button type="button" class="btn-close-custom" data-bs-dismiss="modal">✖</button>
+      </div>
+      <div class="modal-body">
         <form id="rekapForm">
             <input type="hidden" name="action" id="action" value="insert">
             <input type="hidden" name="rowIndex" id="rowIndex" value="">
 
-            <div class="mb-3">
-                <label>Tanggal</label>
-                <input type="date" name="tanggal" id="tanggal" class="form-control" required>
+            <div class="row mb-3">
+                <div class="col-6">
+                    <label>Tanggal</label>
+                    <input type="date" name="tanggal" id="tanggal" class="form-control" required>
+                </div>
+                <div class="col-6">
+                    <label>No. Ref</label>
+                    <input type="text" name="no" id="no" class="form-control" placeholder="Opsional">
+                </div>
             </div>
             <div class="row mb-3">
                 <div class="col-6">
@@ -120,48 +149,46 @@
                     </select>
                 </div>
             </div>
+            
             <div class="mb-3">
-                <label>Uraian / Keterangan</label>
+                <label>Uraian / Detail Barang</label>
                 <input type="text" name="uraian" id="uraian" class="form-control" required>
             </div>
-            <div class="row mb-3">
-                <div class="col-6">
-                    <label>No. Ref (Opsional)</label>
-                    <input type="text" name="no" id="no" class="form-control">
-                </div>
-                <div class="col-6">
+            <div class="mb-3">
+                <label>Keterangan Tambahan</label>
+                <textarea name="keterangan" id="keterangan" class="form-control" rows="2" placeholder="Catatan tambahan (Opsional)"></textarea>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-4">
                     <label>Vol</label>
                     <input type="number" name="volume" id="volume" class="form-control" step="any" value="1" required>
                 </div>
+                <div class="col-8">
+                    <label>Harga Satuan (Rp)</label>
+                    <input type="number" name="harga" id="harga" class="form-control" required>
+                </div>
             </div>
-            <div class="mb-4">
-                <label>Harga / Nominal Pemasukan (Rp)</label>
-                <input type="number" name="harga" id="harga" class="form-control" required>
-            </div>
-            <button type="submit" id="btnSubmit" class="btn-premium">SIMPAN TRANSAKSI</button>
+            <button type="submit" id="btnSubmit" class="btn btn-premium mb-2">SIMPAN TRANSAKSI</button>
         </form>
+      </div>
     </div>
-
-    <div class="mb-3">
-        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari nama barang, proyek, kategori..." onkeyup="filterHistory()">
-    </div>
-    
-    <div id="historyContainer">
-        <div class="text-center text-muted my-4">Sinkronisasi database...</div>
-    </div>
+  </div>
 </div>
 
 <script>
     // ==========================================
     // PASTE URL DEPLOY APPS SCRIPT YANG BARU DI SINI
     // ==========================================
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbw41ZYyP-8ts3v6d3ySf2jQkEIrnOqs2iECNhBSde9kiZXUWBf-zYwgmJ5HB03AEN0/exec'; 
+    const scriptURL = 'PASTE_URL_WEB_APP_YANG_BARU_DISINI'; 
 
     const form = document.getElementById('rekapForm');
     const btnSubmit = document.getElementById('btnSubmit');
     const historyContainer = document.getElementById('historyContainer');
     const formTitle = document.getElementById('formTitle');
-    const btnCancelEdit = document.getElementById('btnCancelEdit');
+    
+    // Inisialisasi Modal Bootstrap
+    const formModal = new bootstrap.Modal(document.getElementById('formModal'));
 
     let currentHistoryData = [];
     let chartProyekObj = null;
@@ -173,7 +200,7 @@
         fetch(scriptURL + "?t=" + new Date().getTime())
             .then(res => res.json())
             .then(data => {
-                // 1. UPDATE SALDO & STATS
+                // UPDATE SALDO
                 const saldoEl = document.getElementById('valSaldo');
                 saldoEl.innerText = formatRp(data.saldo);
                 saldoEl.className = 'saldo-amount ' + (data.saldo >= 0 ? 'saldo-positive' : 'saldo-negative');
@@ -181,10 +208,19 @@
                 document.getElementById('valMasuk').innerText = formatRp(data.kasMasuk);
                 document.getElementById('valKeluar').innerText = formatRp(data.pengeluaran);
 
-                // 2. RENDER CHARTS
-                renderCharts(data.proyek, data.kategori);
+                // UPDATE DETAIL PER PROYEK
+                document.getElementById('inGS').innerText = formatRp(data.inProyek.GS);
+                document.getElementById('inSBG').innerText = formatRp(data.inProyek.SBG);
+                document.getElementById('inKT').innerText = formatRp(data.inProyek.KT);
 
-                // 3. RENDER HISTORY
+                document.getElementById('outGS').innerText = formatRp(data.outProyek.GS);
+                document.getElementById('outSBG').innerText = formatRp(data.outProyek.SBG);
+                document.getElementById('outKT').innerText = formatRp(data.outProyek.KT);
+
+                // RENDER CHARTS
+                renderCharts(data.outProyek, data.kategori);
+
+                // RENDER HISTORY
                 currentHistoryData = data.history;
                 renderHistoryList(currentHistoryData);
             });
@@ -192,8 +228,6 @@
 
     function renderCharts(proyekData, kategoriData) {
         Chart.defaults.color = '#8b92a5';
-        
-        // Destroy old charts if exist to prevent glitch
         if(chartProyekObj) chartProyekObj.destroy();
         if(chartKategoriObj) chartKategoriObj.destroy();
 
@@ -202,27 +236,19 @@
             type: 'doughnut',
             data: {
                 labels: ['GS', 'SBG', 'KT'],
-                datasets: [{
-                    data: [proyekData.GS || 0, proyekData.SBG || 0, proyekData.KT || 0],
-                    backgroundColor: ['#ff3333', '#ff7700', '#ffcc00'],
-                    borderWidth: 0, hoverOffset: 5
-                }]
+                datasets: [{ data: [proyekData.GS || 0, proyekData.SBG || 0, proyekData.KT || 0], backgroundColor: ['#ff3333', '#ff7700', '#ffcc00'], borderWidth: 0 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
 
         const ctxKategori = document.getElementById('chartKategori').getContext('2d');
         chartKategoriObj = new Chart(ctxKategori, {
             type: 'doughnut',
             data: {
-                labels: ['MATERIAL', 'UPAH', 'KANTOR', 'TRANSPORT'],
-                datasets: [{
-                    data: [kategoriData.MATERIAL || 0, kategoriData.UPAH || 0, kategoriData.KANTOR || 0, kategoriData.TRANSPORT || 0],
-                    backgroundColor: ['#00a8ff', '#9c88ff', '#fbc531', '#e84118'],
-                    borderWidth: 0, hoverOffset: 5
-                }]
+                labels: ['MAT', 'UPAH', 'KTR', 'TRP'],
+                datasets: [{ data: [kategoriData.MATERIAL || 0, kategoriData.UPAH || 0, kategoriData.KANTOR || 0, kategoriData.TRANSPORT || 0], backgroundColor: ['#00a8ff', '#9c88ff', '#fbc531', '#e84118'], borderWidth: 0 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
     }
 
@@ -246,6 +272,7 @@
                         <small style="color:#666;">${row.tanggal}</small>
                     </div>
                     <div class="fw-bold text-white mb-1">${row.uraian}</div>
+                    ${row.keterangan ? `<div style="font-size:0.75rem; color:#888; font-style:italic; margin-bottom:5px;">Ket: ${row.keterangan}</div>` : ''}
                     <div class="d-flex justify-content-between align-items-end mt-2">
                         <div style="${textWarna} font-weight:800; font-size:1.1rem;">
                             ${isIn ? '+' : '-'}${formatRp(row.jumlah)}
@@ -259,19 +286,28 @@
         historyContainer.innerHTML = html;
     }
 
-    // Fitur Live Search
     function filterHistory() {
         const keyword = document.getElementById('searchInput').value.toLowerCase();
         const filtered = currentHistoryData.filter(row => 
             (row.uraian && row.uraian.toLowerCase().includes(keyword)) || 
+            (row.keterangan && row.keterangan.toLowerCase().includes(keyword)) ||
             (row.proyek && row.proyek.toLowerCase().includes(keyword)) ||
             (row.kategori && row.kategori.toLowerCase().includes(keyword))
         );
         renderHistoryList(filtered);
     }
 
+    function openModalForNew() {
+        form.reset();
+        document.getElementById('action').value = 'insert';
+        document.getElementById('rowIndex').value = '';
+        formTitle.innerHTML = '⚙️ INPUT TRANSAKSI BARU';
+        formTitle.style.color = '#fff';
+        btnSubmit.innerHTML = 'SIMPAN TRANSAKSI';
+        formModal.show();
+    }
+
     function editData(realRowIndex) {
-        // Cari data aslinya berdasarkan rowIndex
         const data = currentHistoryData.find(r => r.rowIndex === realRowIndex);
         if(!data) return;
 
@@ -281,6 +317,7 @@
         document.getElementById('kategori').value = data.kategori;
         document.getElementById('proyek').value = data.proyek;
         document.getElementById('uraian').value = data.uraian;
+        document.getElementById('keterangan').value = data.keterangan || '';
         document.getElementById('no').value = data.no || '';
         document.getElementById('volume').value = data.volume;
         document.getElementById('harga').value = data.harga;
@@ -288,18 +325,8 @@
         formTitle.innerHTML = '⚙️ UPDATE BARIS ' + data.rowIndex;
         formTitle.style.color = 'var(--accent-yellow)';
         btnSubmit.innerHTML = 'SIMPAN PERUBAHAN';
-        btnCancelEdit.classList.remove('d-none');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function cancelEdit() {
-        form.reset();
-        document.getElementById('action').value = 'insert';
-        document.getElementById('rowIndex').value = '';
-        formTitle.innerHTML = '⚙️ INPUT TRANSAKSI';
-        formTitle.style.color = '#fff';
-        btnSubmit.innerHTML = 'SIMPAN TRANSAKSI';
-        btnCancelEdit.classList.add('d-none');
+        
+        formModal.show(); // Buka Pop-up untuk diedit
     }
 
     form.addEventListener('submit', e => {
@@ -309,7 +336,10 @@
 
         fetch(scriptURL, { method: 'POST', body: new FormData(form) })
             .then(response => response.text())
-            .then(() => { cancelEdit(); loadHistory(); })
+            .then(() => { 
+                formModal.hide(); // Tutup Pop-up setelah sukses
+                loadHistory(); 
+            })
             .catch(() => alert('Gagal! Coba lagi.'))
             .finally(() => btnSubmit.disabled = false);
     });
