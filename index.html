@@ -3,62 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Rekap Premium</title>
+    <title>KSO Financial Ultimate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* TEMA PREMIUM ULTIMATE (Dark, Red, Orange, Yellow) */
-        body { background-color: #0a0a0a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 50px; color: #f0f0f0; }
+        :root { --bg-dark: #0a0c10; --card-bg: #161a23; --accent-green: #00ff88; --accent-red: #ff3333; --accent-orange: #ff7700; --accent-yellow: #ffcc00; --text-main: #f0f0f0; --text-muted: #8b92a5; }
+        body { background-color: var(--bg-dark); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 50px; color: var(--text-main); }
         
-        /* Tipografi Premium */
-        .title-gradient { background: linear-gradient(45deg, #ff2a2a, #ff7b00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; letter-spacing: 1px; }
-        .subtitle { color: #888; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; }
+        .title-gradient { background: linear-gradient(45deg, var(--accent-yellow), var(--accent-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; letter-spacing: 1px; }
+        .card-premium { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 8px 25px rgba(0,0,0,0.5); margin-bottom: 20px; }
         
-        /* Card & Box Style */
-        .premium-card { background-color: #141414; border: 1px solid #2a2a2a; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 20px; position: relative; overflow: hidden; }
-        .premium-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, #ff0000, #ff8c00); }
+        /* Saldo Box */
+        .saldo-box { text-align: center; margin-bottom: 20px; padding: 25px 15px; background: linear-gradient(145deg, #11141b, #0c0e12); border-radius: 20px; border: 1px solid #222; }
+        .saldo-label { color: var(--text-muted); font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; }
+        .saldo-amount { font-size: 2.5rem; font-weight: 900; transition: color 0.3s; }
+        .saldo-positive { color: var(--accent-green); text-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+        .saldo-negative { color: var(--accent-red); text-shadow: 0 0 20px rgba(255, 51, 51, 0.3); }
         
-        /* Total Pengeluaran Box */
-        .total-box { background: linear-gradient(145deg, #1a1a1a, #0f0f0f); border: 1px solid #333; border-radius: 16px; padding: 25px 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(255, 60, 0, 0.15); }
-        .total-label { color: #ff5e00; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
-        .total-amount { color: #ffcc00; font-size: 2.2rem; font-weight: 900; text-shadow: 0 0 15px rgba(255, 204, 0, 0.4); }
+        /* Stats Grid */
+        .stat-split { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border-left: 3px solid; }
+        .stat-in { border-color: var(--accent-green); }
+        .stat-out { border-color: var(--accent-red); }
+        .stat-box .title { font-size: 0.7rem; color: var(--text-muted); font-weight: bold; }
+        .stat-box .val { font-size: 1.1rem; font-weight: 800; color: #fff; }
+
+        /* Chart Canvas Container */
+        .chart-container { position: relative; height: 180px; width: 100%; display: flex; justify-content: center; align-items: center; }
         
-        /* History Card */
-        .history-card { background: #181818; padding: 15px; border-radius: 12px; border-left: 4px solid #ffcc00; margin-bottom: 12px; transition: transform 0.2s; }
-        .history-card:active { transform: scale(0.98); }
+        /* Form & Inputs */
+        label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+        .form-control, .form-select { background-color: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; border-radius: 8px; }
+        .form-control:focus, .form-select:focus { background-color: rgba(0,0,0,0.8); border-color: var(--accent-orange); color: #fff; box-shadow: none; }
+        option { background-color: var(--card-bg); }
         
-        /* Form Inputs Dark Mode */
-        label { color: #999; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
-        .form-control, .form-select { background-color: #222; border: 1px solid #333; color: #fff; border-radius: 8px; font-size: 0.95rem; }
-        .form-control:focus, .form-select:focus { background-color: #2a2a2a; border-color: #ff5e00; color: #fff; box-shadow: 0 0 0 0.25rem rgba(255, 94, 0, 0.25); }
-        .form-select option { background-color: #222; color: #fff; }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        .btn-premium { background: linear-gradient(45deg, var(--accent-orange), var(--accent-red)); color: white; border: none; font-weight: 800; border-radius: 8px; padding: 12px; width: 100%; }
         
-        /* Buttons */
-        .btn-premium { background: linear-gradient(45deg, #cc0000, #ff6600); color: white; border: none; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-radius: 10px; transition: 0.3s; }
-        .btn-premium:hover { background: linear-gradient(45deg, #ff1a1a, #ff8533); color: white; box-shadow: 0 5px 20px rgba(255, 50, 0, 0.4); }
-        .btn-edit { background: #222; color: #ffcc00; border: 1px solid #444; font-size: 0.75rem; padding: 4px 12px; border-radius: 6px; font-weight: bold; }
-        
-        /* Badges */
-        .badge-proyek { background-color: #ff2a2a; color: white; font-weight: 700; letter-spacing: 1px; }
-        .badge-kategori { background-color: #ff9900; color: #000; font-weight: 700; }
+        /* Search & History */
+        .search-box { background: rgba(0,0,0,0.4); border: 1px solid #333; color: #fff; border-radius: 20px; padding: 10px 20px; width: 100%; margin-bottom: 15px; }
+        .history-card { background: rgba(0,0,0,0.2); border: 1px solid #2a2d35; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--accent-yellow); }
+        .history-card.in { border-left-color: var(--accent-green); }
     </style>
 </head>
 <body>
 
 <div class="container mt-4">
     <div class="text-center mb-4">
-        <h4 class="title-gradient m-0">KSO PROJECT CONTROL</h4>
-        <div class="subtitle">CV. Danli & PT. STM</div>
+        <h4 class="title-gradient m-0">KSO DASHBOARD</h4>
+        <div style="color: var(--text-muted); font-size: 0.8rem; letter-spacing: 1px;">CV. DANLI & PT. STM</div>
     </div>
 
-    <div class="total-box">
-        <div class="total-label">⚡ Total Pengeluaran Proyek ⚡</div>
-        <div class="total-amount" id="totalPengeluaran">Rp 0</div>
+    <div class="saldo-box">
+        <div class="saldo-label">SISA SALDO PROYEK</div>
+        <div class="saldo-amount" id="valSaldo">Rp 0</div>
     </div>
 
-    <div class="premium-card p-4">
+    <div class="stat-split">
+        <div class="stat-box stat-in">
+            <div class="title">📥 KAS MASUK</div>
+            <div class="val text-success" id="valMasuk">Rp 0</div>
+        </div>
+        <div class="stat-box stat-out">
+            <div class="title">📤 PENGELUARAN</div>
+            <div class="val text-danger" id="valKeluar">Rp 0</div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="card-premium text-center">
+                <div class="saldo-label mb-2">🔥 PENGELUARAN PER PROYEK</div>
+                <div class="chart-container"><canvas id="chartProyek"></canvas></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card-premium text-center">
+                <div class="saldo-label mb-2">📊 PENGELUARAN KATEGORI</div>
+                <div class="chart-container"><canvas id="chartKategori"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-premium">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="m-0 fw-bold text-white" id="formTitle">DATA ENTRY</h6>
+            <h6 class="m-0 fw-bold text-white" id="formTitle">⚙️ INPUT TRANSAKSI</h6>
             <button id="btnCancelEdit" class="btn btn-sm btn-outline-danger d-none" onclick="cancelEdit()">Batal</button>
         </div>
         
@@ -74,17 +102,18 @@
                 <div class="col-6">
                     <label>Kategori</label>
                     <select name="kategori" id="kategori" class="form-select" required>
-                        <option value="" disabled selected>PILIH...</option>
-                        <option value="MATERIAL">MATERIAL</option>
-                        <option value="UPAH">UPAH</option>
-                        <option value="KANTOR">KANTOR</option>
-                        <option value="TRANSPORT">TRANSPORT</option>
+                        <option value="" disabled selected>Pilih...</option>
+                        <option value="KAS MASUK" class="text-success fw-bold">📥 KAS MASUK</option>
+                        <option value="MATERIAL">📦 MATERIAL</option>
+                        <option value="UPAH">👷 UPAH</option>
+                        <option value="KANTOR">🏢 KANTOR</option>
+                        <option value="TRANSPORT">🚚 TRANSPORT</option>
                     </select>
                 </div>
                 <div class="col-6">
                     <label>Proyek</label>
                     <select name="proyek" id="proyek" class="form-select" required>
-                        <option value="" disabled selected>PILIH...</option>
+                        <option value="" disabled selected>Pilih...</option>
                         <option value="GS">GS</option>
                         <option value="SBG">SBG</option>
                         <option value="KT">KT</option>
@@ -92,36 +121,39 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label>Uraian / Pekerjaan</label>
-                <input type="text" name="uraian" id="uraian" class="form-control" placeholder="Contoh: Semen 50kg..." required>
+                <label>Uraian / Keterangan</label>
+                <input type="text" name="uraian" id="uraian" class="form-control" required>
             </div>
             <div class="row mb-3">
-                <div class="col-4">
+                <div class="col-6">
+                    <label>No. Ref (Opsional)</label>
+                    <input type="text" name="no" id="no" class="form-control">
+                </div>
+                <div class="col-6">
                     <label>Vol</label>
                     <input type="number" name="volume" id="volume" class="form-control" step="any" value="1" required>
                 </div>
-                <div class="col-8">
-                    <label>Harga Satuan</label>
-                    <input type="number" name="harga" id="harga" class="form-control" placeholder="Rp 0" required>
-                </div>
             </div>
-            <button type="submit" id="btnSubmit" class="btn btn-premium w-100 py-3 mt-2">SIMPAN DATA</button>
+            <div class="mb-4">
+                <label>Harga / Nominal Pemasukan (Rp)</label>
+                <input type="number" name="harga" id="harga" class="form-control" required>
+            </div>
+            <button type="submit" id="btnSubmit" class="btn-premium">SIMPAN TRANSAKSI</button>
         </form>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
-        <h6 class="m-0 fw-bold" style="color:#aaa; letter-spacing:1px;">LATEST LOGS (10)</h6>
-        <span onclick="loadHistory()" style="cursor:pointer; color:#ff9900; font-size:0.8rem; font-weight:bold;">🔄 REFRESH</span>
+    <div class="mb-3">
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari nama barang, proyek, kategori..." onkeyup="filterHistory()">
     </div>
     
     <div id="historyContainer">
-        <div class="text-center text-muted my-4">Sinkronisasi server...</div>
+        <div class="text-center text-muted my-4">Sinkronisasi database...</div>
     </div>
 </div>
 
 <script>
     // ==========================================
-    // MASUKKAN URL DEPLOY APPS SCRIPT YANG *BARU* DI BAWAH INI
+    // PASTE URL DEPLOY APPS SCRIPT YANG BARU DI SINI
     // ==========================================
     const scriptURL = 'https://script.google.com/macros/s/AKfycbw41ZYyP-8ts3v6d3ySf2jQkEIrnOqs2iECNhBSde9kiZXUWBf-zYwgmJ5HB03AEN0/exec'; 
 
@@ -130,68 +162,131 @@
     const historyContainer = document.getElementById('historyContainer');
     const formTitle = document.getElementById('formTitle');
     const btnCancelEdit = document.getElementById('btnCancelEdit');
-    const displayTotal = document.getElementById('totalPengeluaran');
+
+    let currentHistoryData = [];
+    let chartProyekObj = null;
+    let chartKategoriObj = null;
 
     const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
 
-    let currentHistoryData = [];
-
     function loadHistory() {
-        historyContainer.innerHTML = '<div class="text-center text-muted my-4">Mengambil data dari server...</div>';
-        
         fetch(scriptURL + "?t=" + new Date().getTime())
             .then(res => res.json())
             .then(data => {
-                // UPDATE TOTAL PENGELUARAN
-                displayTotal.innerText = formatRp(data.total);
+                // 1. UPDATE SALDO & STATS
+                const saldoEl = document.getElementById('valSaldo');
+                saldoEl.innerText = formatRp(data.saldo);
+                saldoEl.className = 'saldo-amount ' + (data.saldo >= 0 ? 'saldo-positive' : 'saldo-negative');
+                
+                document.getElementById('valMasuk').innerText = formatRp(data.kasMasuk);
+                document.getElementById('valKeluar').innerText = formatRp(data.pengeluaran);
 
-                // UPDATE HISTORY CARDS
+                // 2. RENDER CHARTS
+                renderCharts(data.proyek, data.kategori);
+
+                // 3. RENDER HISTORY
                 currentHistoryData = data.history;
-                let html = '';
-                if(currentHistoryData.length === 0) {
-                    html = '<div class="text-center text-muted">Data log masih kosong.</div>';
-                } else {
-                    currentHistoryData.forEach((row, index) => {
-                        html += `
-                        <div class="history-card">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div>
-                                    <span class="badge badge-proyek">${row.proyek}</span>
-                                    <span class="badge badge-kategori ms-1">${row.kategori}</span>
-                                </div>
-                                <small style="color:#666; font-weight:600;">${row.tanggal}</small>
-                            </div>
-                            <div class="fw-bold text-white mb-2" style="font-size:1.05rem;">${row.uraian}</div>
-                            <div class="d-flex justify-content-between align-items-end">
-                                <div style="color:#aaa; font-size:0.9rem;">
-                                    ${row.volume} <span style="font-size:0.75rem;">x</span> ${formatRp(row.harga)}
-                                    <div style="color:#ffcc00; font-weight:900; font-size:1.1rem; margin-top:2px;">${formatRp(row.jumlah)}</div>
-                                </div>
-                                <button class="btn btn-edit" onclick="editData(${index})">EDIT LOG</button>
-                            </div>
-                        </div>`;
-                    });
-                }
-                historyContainer.innerHTML = html;
-            })
-            .catch(err => {
-                historyContainer.innerHTML = '<div class="text-center text-danger">Gagal sinkronisasi. Cek koneksi Anda.</div>';
+                renderHistoryList(currentHistoryData);
             });
     }
 
-    function editData(index) {
-        const data = currentHistoryData[index];
+    function renderCharts(proyekData, kategoriData) {
+        Chart.defaults.color = '#8b92a5';
+        
+        // Destroy old charts if exist to prevent glitch
+        if(chartProyekObj) chartProyekObj.destroy();
+        if(chartKategoriObj) chartKategoriObj.destroy();
+
+        const ctxProyek = document.getElementById('chartProyek').getContext('2d');
+        chartProyekObj = new Chart(ctxProyek, {
+            type: 'doughnut',
+            data: {
+                labels: ['GS', 'SBG', 'KT'],
+                datasets: [{
+                    data: [proyekData.GS || 0, proyekData.SBG || 0, proyekData.KT || 0],
+                    backgroundColor: ['#ff3333', '#ff7700', '#ffcc00'],
+                    borderWidth: 0, hoverOffset: 5
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
+
+        const ctxKategori = document.getElementById('chartKategori').getContext('2d');
+        chartKategoriObj = new Chart(ctxKategori, {
+            type: 'doughnut',
+            data: {
+                labels: ['MATERIAL', 'UPAH', 'KANTOR', 'TRANSPORT'],
+                datasets: [{
+                    data: [kategoriData.MATERIAL || 0, kategoriData.UPAH || 0, kategoriData.KANTOR || 0, kategoriData.TRANSPORT || 0],
+                    backgroundColor: ['#00a8ff', '#9c88ff', '#fbc531', '#e84118'],
+                    borderWidth: 0, hoverOffset: 5
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
+    }
+
+    function renderHistoryList(dataArray) {
+        let html = '';
+        if(dataArray.length === 0) {
+            html = '<div class="text-center text-muted">Data tidak ditemukan.</div>';
+        } else {
+            dataArray.forEach((row, index) => {
+                const isIn = row.kategori === 'KAS MASUK';
+                const cardClass = isIn ? 'history-card in' : 'history-card';
+                const textWarna = isIn ? 'color: var(--accent-green);' : 'color: var(--accent-yellow);';
+                
+                html += `
+                <div class="${cardClass}">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div>
+                            <span class="badge" style="background: rgba(255,255,255,0.1); border: 1px solid #555;">${row.proyek || '-'}</span>
+                            <span class="badge ms-1" style="background: rgba(255,255,255,0.1); border: 1px solid #555;">${row.kategori || '-'}</span>
+                        </div>
+                        <small style="color:#666;">${row.tanggal}</small>
+                    </div>
+                    <div class="fw-bold text-white mb-1">${row.uraian}</div>
+                    <div class="d-flex justify-content-between align-items-end mt-2">
+                        <div style="${textWarna} font-weight:800; font-size:1.1rem;">
+                            ${isIn ? '+' : '-'}${formatRp(row.jumlah)}
+                            <div style="color:var(--text-muted); font-size:0.7rem; font-weight:normal;">Vol: ${row.volume} | Hrg: ${formatRp(row.harga)}</div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary text-white" style="font-size:0.7rem;" onclick="editData(${row.rowIndex})">EDIT</button>
+                    </div>
+                </div>`;
+            });
+        }
+        historyContainer.innerHTML = html;
+    }
+
+    // Fitur Live Search
+    function filterHistory() {
+        const keyword = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = currentHistoryData.filter(row => 
+            (row.uraian && row.uraian.toLowerCase().includes(keyword)) || 
+            (row.proyek && row.proyek.toLowerCase().includes(keyword)) ||
+            (row.kategori && row.kategori.toLowerCase().includes(keyword))
+        );
+        renderHistoryList(filtered);
+    }
+
+    function editData(realRowIndex) {
+        // Cari data aslinya berdasarkan rowIndex
+        const data = currentHistoryData.find(r => r.rowIndex === realRowIndex);
+        if(!data) return;
+
         document.getElementById('action').value = 'update';
         document.getElementById('rowIndex').value = data.rowIndex;
         document.getElementById('tanggal').value = data.tanggal;
         document.getElementById('kategori').value = data.kategori;
         document.getElementById('proyek').value = data.proyek;
         document.getElementById('uraian').value = data.uraian;
+        document.getElementById('no').value = data.no || '';
         document.getElementById('volume').value = data.volume;
         document.getElementById('harga').value = data.harga;
 
-        formTitle.innerHTML = 'UPDATE DATA (Baris ' + data.rowIndex + ')';
-        formTitle.style.color = '#ffcc00';
+        formTitle.innerHTML = '⚙️ UPDATE BARIS ' + data.rowIndex;
+        formTitle.style.color = 'var(--accent-yellow)';
         btnSubmit.innerHTML = 'SIMPAN PERUBAHAN';
         btnCancelEdit.classList.remove('d-none');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -201,9 +296,9 @@
         form.reset();
         document.getElementById('action').value = 'insert';
         document.getElementById('rowIndex').value = '';
-        formTitle.innerHTML = 'DATA ENTRY';
+        formTitle.innerHTML = '⚙️ INPUT TRANSAKSI';
         formTitle.style.color = '#fff';
-        btnSubmit.innerHTML = 'SIMPAN DATA';
+        btnSubmit.innerHTML = 'SIMPAN TRANSAKSI';
         btnCancelEdit.classList.add('d-none');
     }
 
@@ -214,11 +309,8 @@
 
         fetch(scriptURL, { method: 'POST', body: new FormData(form) })
             .then(response => response.text())
-            .then(result => {
-                cancelEdit();
-                loadHistory(); 
-            })
-            .catch(error => alert('Gagal memproses data!'))
+            .then(() => { cancelEdit(); loadHistory(); })
+            .catch(() => alert('Gagal! Coba lagi.'))
             .finally(() => btnSubmit.disabled = false);
     });
 
