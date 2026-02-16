@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { padding: 20px; background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .form-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 800px; margin: auto; }
+        .header-title { border-left: 5px solid #0d6efd; padding-left: 15px; margin-bottom: 25px; color: #333; }
+        label { font-weight: 600; font-size: 0.9rem; color: #555; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h3 class="header-title">Rekap Pengeluaran Proyek</h3>
+            <form id="rekapForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label>Tanggal</label>
+                        <input type="date" name="tanggal" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label>No. Referensi</label>
+                        <input type="text" name="no" class="form-control" placeholder="Contoh: 001/INV">
+                    </div>
+
+                    <div class="col-12">
+                        <label>Uraian Pekerjaan / Barang</label>
+                        <input type="text" name="uraian" class="form-control" placeholder="Deskripsi singkat..." required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Kategori</label>
+                        <select name="kategori" class="form-select" required>
+                            <option value="" disabled selected>Pilih Kategori...</option>
+                            <option value="MATERIAL">MATERIAL</option>
+                            <option value="UPAH">UPAH</option>
+                            <option value="KANTOR">KANTOR</option>
+                            <option value="TRANSPORT">TRANSPORT</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Proyek</label>
+                        <select name="proyek" class="form-select" required>
+                            <option value="" disabled selected>Pilih Lokasi Proyek...</option>
+                            <option value="GS">GS (Gunung Sitoli)</option>
+                            <option value="SBG">SBG (Sibolga)</option>
+                            <option value="KT">KT (Kuala Tanjung)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Volume</label>
+                        <input type="number" name="volume" id="vol" class="form-control" step="any" value="1" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Harga Satuan (Rp)</label>
+                        <input type="number" name="harga" id="hrg" class="form-control" placeholder="0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Total Jumlah</label>
+                        <input type="text" id="total" class="form-control bg-light" readonly value="0">
+                    </div>
+
+                    <div class="col-12">
+                        <label>Keterangan Tambahan</label>
+                        <textarea name="keterangan" class="form-control" rows="2" placeholder="Opsional..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary mt-4 w-100 py-2">
+                    <span id="btnText">Simpan Data Rekap</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const vol = document.getElementById('vol');
+        const hrg = document.getElementById('hrg');
+        const total = document.getElementById('total');
+
+        // Fungsi hitung otomatis
+        function calculate() {
+            const result = (vol.value || 0) * (hrg.value || 0);
+            total.value = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(result);
+        }
+
+        [vol, hrg].forEach(el => el.addEventListener('input', calculate));
+
+        document.getElementById('rekapForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            
+            btn.disabled = true;
+            btnText.innerText = "Sedang Menyimpan...";
+
+            const formData = Object.fromEntries(new FormData(this));
+            
+            google.script.run.withSuccessHandler(msg => {
+                alert(msg);
+                this.reset();
+                total.value = "0";
+                btn.disabled = false;
+                btnText.innerText = "Simpan Data Rekap";
+            }).tambahData(formData);
+        });
+    </script>
+</body>
+</html>
