@@ -2,81 +2,92 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Rekap KSO | Danli & Swakarsa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rekap KSO Proyek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-top: 20px; }
-        .card { box-shadow: 0 4px 8px rgba(0,0,0,0.05); border: none; border-radius: 10px; margin-bottom: 20px; }
-        .header-title { color: #0d6efd; font-weight: bold; }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 50px; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 15px; }
+        .history-card { background: white; padding: 15px; border-radius: 10px; border-left: 5px solid #0d6efd; margin-bottom: 10px; box-shadow: 0 1px 5px rgba(0,0,0,0.05);}
+        .btn-edit { font-size: 0.8rem; padding: 2px 10px; }
+        label { font-weight: 600; font-size: 0.85rem; color: #555; margin-bottom: 3px; }
+        .form-control, .form-select { font-size: 0.95rem; }
     </style>
 </head>
 <body>
 
-<div class="container max-w-7xl">
-    <h3 class="text-center header-title mb-4">REKAP PENGELUARAN PROYEK<br><small class="text-muted fs-5">CV. Danli & PT. Swakarsa Tunggal Mandiri</small></h3>
+<div class="container mt-3">
+    <h5 class="text-center fw-bold text-primary mb-3">REKAP PROYEK<br><small class="text-dark">CV. Danli & PT. STM</small></h5>
 
-    <div class="row">
-        <div class="col-lg-5">
-            <div class="card p-4">
-                <h5 class="mb-3">Input Data Baru</h5>
-                <form id="rekapForm">
-                    <div class="mb-2"><label>Tanggal</label><input type="date" name="tanggal" class="form-control" required></div>
-                    <div class="row mb-2">
-                        <div class="col-6"><label>No. Ref</label><input type="text" name="no" class="form-control"></div>
-                        <div class="col-6"><label>Proyek</label>
-                            <select name="proyek" class="form-select" required>
-                                <option value="" disabled selected>Pilih...</option>
-                                <option value="GS">GS (Gunung Sitoli)</option>
-                                <option value="SBG">SBG (Sibolga)</option>
-                                <option value="KT">KT (Kuala Tanjung)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-2"><label>Kategori</label>
-                        <select name="kategori" class="form-select" required>
-                            <option value="" disabled selected>Pilih Kategori...</option>
-                            <option value="MATERIAL">MATERIAL</option>
-                            <option value="UPAH">UPAH</option>
-                            <option value="KANTOR">KANTOR</option>
-                            <option value="TRANSPORT">TRANSPORT</option>
-                        </select>
-                    </div>
-                    <div class="mb-2"><label>Uraian</label><input type="text" name="uraian" class="form-control" required></div>
-                    <div class="mb-2"><label>Keterangan</label><input type="text" name="keterangan" class="form-control"></div>
-                    <div class="row mb-3">
-                        <div class="col-6"><label>Volume</label><input type="number" name="volume" class="form-control" step="any" value="1" required></div>
-                        <div class="col-6"><label>Harga (Rp)</label><input type="number" name="harga" class="form-control" required></div>
-                    </div>
-                    <button type="submit" id="btnSubmit" class="btn btn-primary w-100">Simpan Data</button>
-                </form>
-            </div>
+    <div class="card p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="m-0 fw-bold" id="formTitle">📝 Input Data Baru</h6>
+            <button id="btnCancelEdit" class="btn btn-sm btn-danger d-none" onclick="cancelEdit()">Batal Edit</button>
         </div>
+        
+        <form id="rekapForm">
+            <input type="hidden" name="action" id="action" value="insert">
+            <input type="hidden" name="rowIndex" id="rowIndex" value="">
 
-        <div class="col-lg-7">
-            <div class="card p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="m-0">10 Transaksi Terakhir</h5>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="loadHistory()">Refresh</button>
+            <div class="mb-2">
+                <label>Tanggal</label>
+                <input type="date" name="tanggal" id="tanggal" class="form-control" required>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6">
+                    <label>Kategori</label>
+                    <select name="kategori" id="kategori" class="form-select" required>
+                        <option value="" disabled selected>Pilih...</option>
+                        <option value="MATERIAL">MATERIAL</option>
+                        <option value="UPAH">UPAH</option>
+                        <option value="KANTOR">KANTOR</option>
+                        <option value="TRANSPORT">TRANSPORT</option>
+                    </select>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover" style="font-size: 0.9rem;">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Tgl</th>
-                                <th>Proyek</th>
-                                <th>Kategori</th>
-                                <th>Uraian</th>
-                                <th>Total (Rp)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTable">
-                            <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
-                        </tbody>
-                    </table>
+                <div class="col-6">
+                    <label>Proyek</label>
+                    <select name="proyek" id="proyek" class="form-select" required>
+                        <option value="" disabled selected>Pilih...</option>
+                        <option value="GS">GS</option>
+                        <option value="SBG">SBG</option>
+                        <option value="KT">KT</option>
+                    </select>
                 </div>
             </div>
-        </div>
+            <div class="mb-2">
+                <label>Uraian / Pekerjaan</label>
+                <input type="text" name="uraian" id="uraian" class="form-control" required>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6">
+                    <label>No. Ref (Opsional)</label>
+                    <input type="text" name="no" id="no" class="form-control">
+                </div>
+                <div class="col-6">
+                    <label>Ket Tambahan</label>
+                    <input type="text" name="keterangan" id="keterangan" class="form-control">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4">
+                    <label>Vol</label>
+                    <input type="number" name="volume" id="volume" class="form-control" step="any" value="1" required>
+                </div>
+                <div class="col-8">
+                    <label>Harga Satuan (Rp)</label>
+                    <input type="number" name="harga" id="harga" class="form-control" required>
+                </div>
+            </div>
+            <button type="submit" id="btnSubmit" class="btn btn-primary w-100 fw-bold py-2">💾 Simpan Data</button>
+        </form>
+    </div>
+
+    <h6 class="fw-bold mt-4 mb-2 text-secondary d-flex justify-content-between">
+        <span>🕒 10 Transaksi Terakhir</span>
+        <span onclick="loadHistory()" style="cursor:pointer;">🔄 Refresh</span>
+    </h6>
+    <div id="historyContainer">
+        <div class="text-center text-muted my-4"><small>Memuat data...</small></div>
     </div>
 </div>
 
@@ -88,68 +99,111 @@
 
     const form = document.getElementById('rekapForm');
     const btnSubmit = document.getElementById('btnSubmit');
-    const historyTable = document.getElementById('historyTable');
+    const historyContainer = document.getElementById('historyContainer');
+    const formTitle = document.getElementById('formTitle');
+    const btnCancelEdit = document.getElementById('btnCancelEdit');
 
-    // Fungsi Format Rupiah
-    const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(angka);
-    // Fungsi Format Tanggal
-    const formatTgl = (tglStr) => {
-        if (!tglStr) return '-';
-        const d = new Date(tglStr);
-        return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-    };
+    const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(angka || 0);
 
-    // 1. Fungsi Ambil Data (GET)
+    // Variabel global untuk menampung data history sementara
+    let currentHistoryData = [];
+
     function loadHistory() {
-        historyTable.innerHTML = '<tr><td colspan="5" class="text-center">Memuat data dari server...</td></tr>';
-        fetch(scriptURL)
-            .then(response => response.json())
+        historyContainer.innerHTML = '<div class="text-center text-muted my-4"><small>🔄 Sinkronisasi data...</small></div>';
+        
+        // Menambahkan parameter timestamp agar HP tidak meload cache/history lama
+        fetch(scriptURL + "?t=" + new Date().getTime())
+            .then(res => res.json())
             .then(data => {
-                let rows = '';
+                currentHistoryData = data;
+                let html = '';
                 if(data.length === 0) {
-                    rows = '<tr><td colspan="5" class="text-center">Belum ada data</td></tr>';
+                    html = '<div class="text-center text-muted"><small>Belum ada data</small></div>';
                 } else {
-                    data.forEach(row => {
-                        // row[0]=Tanggal, row[8]=Proyek, row[7]=Kategori, row[2]=Uraian, row[6]=Jumlah
-                        rows += `<tr>
-                            <td>${formatTgl(row[0])}</td>
-                            <td><span class="badge bg-secondary">${row[8] || '-'}</span></td>
-                            <td>${row[7] || '-'}</td>
-                            <td>${row[2] || '-'}</td>
-                            <td class="text-end fw-bold">${formatRp(row[6] || 0)}</td>
-                        </tr>`;
+                    data.forEach((row, index) => {
+                        html += `
+                        <div class="history-card">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="badge bg-secondary">${row.proyek} - ${row.kategori}</span>
+                                <small class="text-muted">${row.tanggal}</small>
+                            </div>
+                            <div class="fw-bold text-dark" style="font-size:1.05rem;">${row.uraian}</div>
+                            <div class="d-flex justify-content-between align-items-end mt-2">
+                                <div class="text-success fw-bold">${row.volume} x ${formatRp(row.harga)} = ${formatRp(row.jumlah)}</div>
+                                <button class="btn btn-outline-primary btn-edit" onclick="editData(${index})">✏️ Edit</button>
+                            </div>
+                        </div>`;
                     });
                 }
-                historyTable.innerHTML = rows;
+                historyContainer.innerHTML = html;
             })
-            .catch(error => {
-                historyTable.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal memuat data.</td></tr>';
+            .catch(err => {
+                historyContainer.innerHTML = '<div class="text-center text-danger"><small>Gagal memuat history.</small></div>';
             });
     }
 
-    // 2. Fungsi Simpan Data (POST)
+    function editData(index) {
+        const data = currentHistoryData[index];
+        
+        // Ubah state form menjadi Update
+        document.getElementById('action').value = 'update';
+        document.getElementById('rowIndex').value = data.rowIndex;
+        
+        // Isi form dengan data lama
+        document.getElementById('tanggal').value = data.tanggal;
+        document.getElementById('kategori').value = data.kategori;
+        document.getElementById('proyek').value = data.proyek;
+        document.getElementById('uraian').value = data.uraian;
+        document.getElementById('no').value = data.no;
+        document.getElementById('keterangan').value = data.keterangan;
+        document.getElementById('volume').value = data.volume;
+        document.getElementById('harga').value = data.harga;
+
+        // Ubah tampilan form
+        formTitle.innerHTML = '✏️ Edit Data (Baris ' + data.rowIndex + ')';
+        formTitle.classList.replace('text-primary', 'text-warning');
+        btnSubmit.classList.replace('btn-primary', 'btn-warning');
+        btnSubmit.innerHTML = '🔄 Update Data';
+        btnCancelEdit.classList.remove('d-none');
+
+        // Scroll otomatis ke atas
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+        form.reset();
+        document.getElementById('action').value = 'insert';
+        document.getElementById('rowIndex').value = '';
+        
+        formTitle.innerHTML = '📝 Input Data Baru';
+        formTitle.classList.replace('text-warning', 'text-primary');
+        btnSubmit.classList.replace('btn-warning', 'btn-primary');
+        btnSubmit.innerHTML = '💾 Simpan Data';
+        btnCancelEdit.classList.add('d-none');
+    }
+
     form.addEventListener('submit', e => {
         e.preventDefault();
+        const isUpdate = document.getElementById('action').value === 'update';
+        
         btnSubmit.disabled = true;
-        btnSubmit.innerHTML = 'Menyimpan...';
+        btnSubmit.innerHTML = '⏳ Proses...';
 
         fetch(scriptURL, { method: 'POST', body: new FormData(form) })
             .then(response => response.text())
             .then(result => {
-                alert('Data berhasil disimpan ke Spreadsheet!');
-                form.reset();
-                btnSubmit.disabled = false;
-                btnSubmit.innerHTML = 'Simpan Data';
-                loadHistory(); // Refresh tabel setelah simpan
+                alert(result); // Menampilkan pesan sukses dari script
+                cancelEdit(); // Reset form kembali ke mode Insert
+                loadHistory(); // Tarik data terbaru
             })
             .catch(error => {
-                alert('Gagal menyimpan data!');
+                alert('Gagal memproses data. Cek koneksi Anda.');
+            })
+            .finally(() => {
                 btnSubmit.disabled = false;
-                btnSubmit.innerHTML = 'Simpan Data';
             });
     });
 
-    // Panggil history saat web pertama kali dibuka
     window.onload = loadHistory;
 </script>
 
